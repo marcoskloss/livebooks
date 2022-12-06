@@ -1,0 +1,31 @@
+# Advent of Code 2022
+
+```elixir
+Mix.install([:kino])
+```
+
+## Setup
+
+```elixir
+input = Kino.Input.textarea("Please paste your input")
+```
+
+## Day 01
+
+### Part 1
+
+```elixir
+input = Kino.Input.read(input)
+
+input
+|> String.split("\n")
+|> Enum.chunk_by(fn val -> val == "" end)
+|> Enum.filter(fn chunk -> chunk != [""] end)
+|> Enum.map(fn chunk -> Enum.map(chunk, &String.to_integer/1) end)
+|> Enum.reduce([], fn chunk, acc ->
+  sum = chunk |> Enum.sum()
+  Enum.concat(acc, [sum])
+end)
+|> Enum.sort(:desc)
+|> Enum.at(0)
+```
