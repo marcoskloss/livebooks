@@ -15,9 +15,8 @@ input = Kino.Input.textarea("Please paste your input")
 ### Part 1
 
 ```elixir
-input = Kino.Input.read(input)
-
 input
+|> Kino.Input.read()
 |> String.split("\n")
 |> Enum.chunk_by(fn val -> val == "" end)
 |> Enum.filter(fn chunk -> chunk != [""] end)
@@ -28,4 +27,22 @@ input
 end)
 |> Enum.sort(:desc)
 |> Enum.at(0)
+```
+
+### Part 2
+
+```elixir
+input
+|> Kino.Input.read()
+|> String.split("\n")
+|> Enum.chunk_by(fn val -> val == "" end)
+|> Enum.filter(fn chunk -> chunk != [""] end)
+|> Enum.map(fn chunk -> Enum.map(chunk, &String.to_integer/1) end)
+|> Enum.reduce([], fn chunk, acc ->
+  sum = chunk |> Enum.sum()
+  Enum.concat(acc, [sum])
+end)
+|> Enum.sort(:desc)
+|> Enum.slice(0..2)
+|> Enum.sum()
 ```
