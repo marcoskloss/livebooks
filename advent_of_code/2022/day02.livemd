@@ -31,31 +31,33 @@ defmodule Game do
     ["Paper", "Rock"]
   ]
 
+  def process_pair(pair) do
+    [oponent, player] = pair_sign_to_shape(pair)
+    calculate_points([player, oponent])
+  end
+
   defp pair_sign_to_shape(pair) do
     [oponent, player] = pair
     [@sign_by_shape[oponent], @sign_by_shape[player]]
+  end
+
+  defp result_points(true, _player_won, score) do
+    score + 3
+  end
+
+  defp result_points(_draw, true, score) do
+    score + 6
+  end
+
+  defp result_points(false, false, score) do
+    score
   end
 
   defp calculate_points([player, oponent]) do
     shape_score = @shape_point[player]
     player_won = @shape_defeats |> Enum.member?([player, oponent])
     draw = player == oponent
-
-    # todo: please refactor me
-    if draw do
-      shape_score + 3
-    else
-      if player_won do
-        shape_score + 6
-      else
-        shape_score
-      end
-    end
-  end
-
-  def process_pair(pair) do
-    [oponent, player] = pair_sign_to_shape(pair)
-    calculate_points([player, oponent])
+    result_points(draw, player_won, shape_score)
   end
 end
 
