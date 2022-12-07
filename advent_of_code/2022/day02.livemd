@@ -70,5 +70,68 @@ input
 ### Part 2
 
 ```elixir
+defmodule Game do
+  @sign_by_shape %{
+    "A" => "Rock",
+    "B" => "Paper",
+    "C" => "Scissors",
+    "X" => "Rock",
+    "Y" => "Paper",
+    "Z" => "Scissors"
+  }
+  @shape_point %{"Rock" => 1, "Paper" => 2, "Scissors" => 3}
+  @shape_defeats [
+    ["Rock", "Scissors"],
+    ["Scissors", "Paper"],
+    ["Paper", "Rock"]
+  ]
+  @draw_value 3
+  @win_value 6
 
+  def process_pair([oponent, "X"]) do
+    loose_round(oponent)
+  end
+
+  def process_pair([oponent, "Y"]) do
+    draw_round(oponent)
+  end
+
+  def process_pair([oponent, "Z"]) do
+    win_round(oponent)
+  end
+
+  defp win_round(oponent) do
+    oponent_shape = @sign_by_shape[oponent]
+
+    winner_shape =
+      @shape_defeats
+      |> Enum.find(fn pair -> Enum.at(pair, 1) == oponent_shape end)
+      |> Enum.at(0)
+
+    @shape_point[winner_shape] + @win_value
+  end
+
+  defp loose_round(oponent) do
+    oponent_shape = @sign_by_shape[oponent]
+
+    looser_shape =
+      @shape_defeats
+      |> Enum.find(fn pair -> Enum.at(pair, 0) == oponent_shape end)
+      |> Enum.at(1)
+
+    @shape_point[looser_shape]
+  end
+
+  defp draw_round(oponent) do
+    oponent_shape = @sign_by_shape[oponent]
+    @shape_point[oponent_shape] + @draw_value
+  end
+end
+
+input
+|> Kino.Input.read()
+|> String.split()
+|> Enum.chunk_every(2)
+|> Enum.map(&Game.process_pair/1)
+|> Enum.sum()
 ```
