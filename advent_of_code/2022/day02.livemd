@@ -1,0 +1,74 @@
+# Advent of Code 2022
+
+```elixir
+Mix.install([:kino])
+```
+
+## Setup
+
+```elixir
+input = Kino.Input.textarea("Please paste your input")
+```
+
+## Day 02
+
+### Part 1
+
+```elixir
+defmodule Game do
+  @sign_by_shape %{
+    "A" => "Rock",
+    "B" => "Paper",
+    "C" => "Scissors",
+    "X" => "Rock",
+    "Y" => "Paper",
+    "Z" => "Scissors"
+  }
+  @shape_point %{"Rock" => 1, "Paper" => 2, "Scissors" => 3}
+  @shape_defeats [
+    ["Rock", "Scissors"],
+    ["Scissors", "Paper"],
+    ["Paper", "Rock"]
+  ]
+
+  defp pair_sign_to_shape(pair) do
+    [oponent, player] = pair
+    [@sign_by_shape[oponent], @sign_by_shape[player]]
+  end
+
+  defp calculate_points([player, oponent]) do
+    shape_score = @shape_point[player]
+    player_won = @shape_defeats |> Enum.member?([player, oponent])
+    draw = player == oponent
+
+    # todo: please refactor me
+    if draw do
+      shape_score + 3
+    else
+      if player_won do
+        shape_score + 6
+      else
+        shape_score
+      end
+    end
+  end
+
+  def process_pair(pair) do
+    [oponent, player] = pair_sign_to_shape(pair)
+    calculate_points([player, oponent])
+  end
+end
+
+input
+|> Kino.Input.read()
+|> String.split()
+|> Enum.chunk_every(2)
+|> Enum.map(&Game.process_pair/1)
+|> Enum.sum()
+```
+
+### Part 2
+
+```elixir
+
+```
