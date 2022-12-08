@@ -1,0 +1,60 @@
+# Advent of Code 2022
+
+```elixir
+Mix.install([:kino])
+```
+
+## Setup
+
+```elixir
+input = Kino.Input.textarea("Please paste your input")
+```
+
+## Day 03
+
+### Part 1
+
+```elixir
+defmodule Puzzle do
+  def split_rucksack_in_half(rucksack) do
+    charlist = rucksack |> String.graphemes()
+    size = length(charlist) / 2
+    Enum.chunk_every(charlist, trunc(size))
+  end
+
+  def find_intersection_between_halfs(pair) do
+    [first_half, second_half] = pair
+    first_mapset = MapSet.new(first_half)
+    second_mapset = MapSet.new(second_half)
+
+    MapSet.intersection(first_mapset, second_mapset)
+    |> MapSet.to_list()
+    |> Enum.at(0)
+  end
+
+  def convert_to_priority(char) do
+    ascii_code = :binary.first(char)
+    is_upper_case = ascii_code < 97
+
+    if is_upper_case do
+      ascii_code - 38
+    else
+      ascii_code - 96
+    end
+  end
+end
+
+input
+|> Kino.Input.read()
+|> String.split()
+|> Enum.map(&Puzzle.split_rucksack_in_half/1)
+|> Enum.map(&Puzzle.find_intersection_between_halfs/1)
+|> Enum.map(&Puzzle.convert_to_priority/1)
+|> Enum.sum()
+```
+
+### Part 2
+
+```elixir
+
+```
