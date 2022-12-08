@@ -1,0 +1,38 @@
+# Advent of Code 2022
+
+```elixir
+Mix.install([:kino])
+```
+
+## Setup
+
+```elixir
+input = Kino.Input.textarea("Please paste your input")
+```
+
+## Day 04
+
+### Part 1
+
+```elixir
+input
+|> Kino.Input.read()
+|> String.split(~r{\n|,|-})
+|> Enum.chunk_every(4)
+|> Enum.map(fn assignments ->
+  assignments |> Enum.map(&String.to_integer/1)
+end)
+|> Enum.filter(fn assignments ->
+  [p1_first, p1_second, p2_first, p2_second] = assignments
+  first_contains_second = p1_first <= p2_first && p1_second >= p2_second
+  second_contains_first = p2_first <= p1_first && p2_second >= p1_second
+  first_contains_second or second_contains_first
+end)
+|> Enum.count()
+```
+
+### Part 2
+
+```elixir
+
+```
