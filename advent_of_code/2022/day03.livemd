@@ -56,5 +56,38 @@ input
 ### Part 2
 
 ```elixir
+defmodule Puzzle do
+  def find_common_char(group) do
+    [first, second, third] =
+      group
+      |> Enum.map(&String.to_charlist/1)
+      |> Enum.map(&MapSet.new/1)
 
+    common_char =
+      MapSet.intersection(first, second)
+      |> MapSet.intersection(third)
+      |> MapSet.to_list()
+
+    common_char
+  end
+
+  def convert_to_priority(char) do
+    ascii_code = char |> to_string |> :binary.first()
+    is_upper_case = ascii_code < 97
+
+    if is_upper_case do
+      ascii_code - 38
+    else
+      ascii_code - 96
+    end
+  end
+end
+
+input
+|> Kino.Input.read()
+|> String.split()
+|> Enum.chunk_every(3)
+|> Enum.map(&Puzzle.find_common_char/1)
+|> Enum.map(&Puzzle.convert_to_priority/1)
+|> Enum.sum()
 ```
