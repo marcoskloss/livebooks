@@ -34,5 +34,18 @@ end)
 ### Part 2
 
 ```elixir
-
+input
+|> Kino.Input.read()
+|> String.split(~r{\n|,|-})
+|> Enum.chunk_every(4)
+|> Enum.map(fn assignments ->
+  assignments |> Enum.map(&String.to_integer/1)
+end)
+|> Enum.filter(fn assignments ->
+  [p1_first, p1_second, p2_first, p2_second] = assignments
+  first_overlaps_second = p1_first <= p2_first && p1_second >= p2_first
+  second_overlaps_first = p2_first <= p1_first && p2_second >= p1_first
+  first_overlaps_second or second_overlaps_first
+end)
+|> Enum.count()
 ```
