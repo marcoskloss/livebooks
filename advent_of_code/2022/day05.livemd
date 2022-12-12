@@ -135,3 +135,73 @@ input
 ```
 
 ### Part 2
+
+```elixir
+defmodule Puzzle2 do
+  def solve(input) do
+    {stacks, moves} = parse_input(input)
+
+    Enum.reduce(moves, stacks, fn move, acc ->
+      from_stack = Map.get(acc, move.from)
+      to_stack = Map.get(acc, move.to)
+
+      {popped_items, from_stack} = Stack.pop(from_stack, move.quantity)
+      to_stack = popped_items |> Stack.push(to_stack)
+
+      acc
+      |> Map.replace(move.from, from_stack)
+      |> Map.replace(move.to, to_stack)
+    end)
+    |> Enum.map(fn {_key, value} -> Stack.head(value) end)
+    |> Enum.join()
+  end
+
+  defp parse_input(input) do
+    [stacks, moves] = input |> String.split("\n\n", trim: true)
+    stacks = parse_stacks(stacks)
+    moves = parse_moves(moves)
+    {stacks, moves}
+  end
+
+  defp parse_stacks(stacks) do
+    stacks
+    |> String.split("\n", trim: true)
+    |> Enum.drop(-1)
+    |> map_crates_by_stack_index()
+  end
+
+  defp map_crates_by_stack_index(stacks) do
+    stacks
+    |> Enum.flat_map(fn line ->
+      line |> String.graphemes() |> Enum.drop(1) |> Enum.take_every(4) |> Enum.with_index()
+    end)
+    |> Enum.group_by(&elem(&1, 1))
+    |> Enum.map(fn {key, value} ->
+      {key + 1, value |> Enum.map(&elem(&1, 0)) |> Enum.filter(&(&1 != " "))}
+    end)
+    |> Enum.reduce(%{}, fn group, acc ->
+      {stack_number, values} = group
+      Map.put(acc, stack_number, Stack.new(values))
+    end)
+  end
+
+  defp parse_moves(moves) do
+    moves
+    |> String.split("\n")
+    |> Enum.map(&String.split/1)
+    |> Enum.map(fn move ->
+      [quantity, from, to] =
+        move
+        |> Enum.map(&Integer.parse/1)
+        |> Enum.filter(&(&1 !== :error))
+        |> Enum.map(&elem(&1, 0))
+
+      %{quantity: quantity, from: from, to: to}
+    end)
+  end
+end
+
+input
+|> Kino.Input.read()
+|> Puzzle2.solve()
+```
