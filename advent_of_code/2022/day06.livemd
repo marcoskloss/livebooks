@@ -1,0 +1,32 @@
+# Advent of Code 2022
+
+```elixir
+Mix.install([:kino])
+```
+
+## Setup
+
+```elixir
+input = Kino.Input.textarea("Please paste your input")
+```
+
+## Day 06
+
+### Part 1
+
+```elixir
+input
+|> Kino.Input.read()
+|> String.graphemes()
+|> Enum.chunk_every(4, 1, :discard)
+|> Enum.map(&Enum.uniq/1)
+|> Enum.map(&length/1)
+|> Enum.find_index(&(&1 === 4))
+|> Kernel.+(4)
+```
+
+### Part 2
+
+```elixir
+
+```
