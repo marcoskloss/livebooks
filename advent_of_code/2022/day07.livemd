@@ -1,0 +1,71 @@
+# Advent of Code 2022
+
+```elixir
+Mix.install([:kino])
+```
+
+## Setup
+
+```elixir
+input = Kino.Input.textarea("Please paste your input")
+```
+
+## Day 07
+
+```elixir
+lines =
+  input
+  |> Kino.Input.read()
+  |> String.split("\n")
+  |> Enum.filter(fn
+    "dir " <> _ -> false
+    "$ ls" -> false
+    _ -> true
+  end)
+
+sizes =
+  lines
+  |> Enum.concat(Enum.map(1..length(lines), fn _ -> "$ cd .." end))
+  |> Enum.reduce(
+    # {stack, computed_values}
+    {[0], []},
+    fn
+      "$ cd ..", {[], computed} ->
+        {[], computed}
+
+      "$ cd ..", {[_last], computed} ->
+        {[], computed}
+
+      "$ cd ..", {stack, computed} ->
+        [dir_size, parent_dir_size | stack_tail] = stack
+        new_stack = [dir_size + parent_dir_size | stack_tail]
+        {new_stack, [dir_size | computed]}
+
+      "$ cd " <> _dir, {stack, computed} ->
+        {[0 | stack], computed}
+
+      file, {stack, computed} ->
+        [dir_size | stack_tail] = stack
+        file_size = file |> String.split(" ") |> List.first() |> String.to_integer()
+        {[dir_size + file_size | stack_tail], computed}
+    end
+  )
+  |> Tuple.to_list()
+  |> Enum.at(1)
+```
+
+### Part 1
+
+```elixir
+sizes |> Enum.filter(&(&1 <= 100_000)) |> Enum.sum()
+```
+
+### Part 2
+
+```elixir
+to_free = 30_000_000 - (70_000_000 - List.first(sizes))
+
+sizes
+|> Enum.sort()
+|> Enum.find(&(&1 >= to_free))
+```
