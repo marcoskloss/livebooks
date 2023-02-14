@@ -1,0 +1,164 @@
+# Advent of Code 2022
+
+```elixir
+Mix.install([:kino])
+```
+
+## Setup
+
+```elixir
+input = Kino.Input.textarea("Please paste your input")
+```
+
+## Day 08
+
+## Part 1
+
+```elixir
+grid =
+  input
+  |> Kino.Input.read()
+  |> String.split("\n")
+  |> Enum.map(fn str -> str |> String.graphemes() |> Enum.map(&String.to_integer/1) end)
+
+height = length(grid)
+width = length(Enum.at(grid, 0))
+
+rows_sum =
+  for i <- 1..(height - 2) do
+    res =
+      for j <- 1..(width - 2) do
+        max_top =
+          grid
+          |> Enum.slice(0..(i - 1))
+          |> Enum.map(fn row -> row |> Enum.at(j) end)
+          |> Enum.max()
+
+        max_right =
+          grid
+          |> Enum.at(i)
+          |> Enum.slice((j + 1)..width)
+          |> Enum.max()
+
+        max_bottom =
+          grid
+          |> Enum.slice((i + 1)..height)
+          |> Enum.map(fn row -> row |> Enum.at(j) end)
+          |> Enum.max()
+
+        max_left =
+          grid
+          |> Enum.at(i)
+          |> Enum.slice(0..(j - 1))
+          |> Enum.max()
+
+        curr_height = grid |> Enum.at(i) |> Enum.at(j)
+
+        is_visible =
+          curr_height > max_top or
+            curr_height > max_right or
+            curr_height > max_bottom or
+            curr_height > max_left
+
+        if is_visible, do: 1, else: 0
+      end
+
+    res |> Enum.sum()
+  end
+
+interior_visible_trees_count = rows_sum |> Enum.sum()
+edge_visible_tress_count = height * 2 + (width - 2) * 2
+
+## should be 1809 for my input
+interior_visible_trees_count + edge_visible_tress_count
+```
+
+## Part 2
+
+```elixir
+defmodule Utils do
+  def take_until(list, func) do
+    take_until(list, func, [])
+  end
+
+  defp take_until(list, func, acc) when length(list) > 1 do
+    [head | tail] = list
+    acc = acc ++ [head]
+    if func.(head), do: acc, else: take_until(tail, func, acc)
+  end
+
+  defp take_until(list, _func, acc) when length(list) == 1 do
+    acc ++ list
+  end
+end
+
+grid =
+  input
+  |> Kino.Input.read()
+  |> String.split("\n")
+  |> Enum.map(fn str -> str |> String.graphemes() |> Enum.map(&String.to_integer/1) end)
+
+height = length(grid)
+width = length(Enum.at(grid, 0))
+
+scores =
+  for i <- 0..(height - 1) do
+    scenic_score =
+      for j <- 0..(width - 1) do
+        curr_tree_height = grid |> Enum.at(i) |> Enum.at(j)
+
+        top =
+          if i == 0 do
+            0
+          else
+            grid
+            |> Enum.slice(0..(i - 1))
+            |> Enum.map(fn row -> row |> Enum.at(j) end)
+            |> Enum.reverse()
+            |> Utils.take_until(fn x -> x >= curr_tree_height end)
+            |> Enum.count()
+          end
+
+        right =
+          if j == width - 1 do
+            0
+          else
+            grid
+            |> Enum.at(i)
+            |> Enum.slice((j + 1)..width)
+            |> Utils.take_until(fn x -> x >= curr_tree_height end)
+            |> Enum.count()
+          end
+
+        bottom =
+          if i == height - 1 do
+            0
+          else
+            grid
+            |> Enum.slice((i + 1)..height)
+            |> Enum.map(fn row -> row |> Enum.at(j) end)
+            |> Utils.take_until(fn x -> x >= curr_tree_height end)
+            |> Enum.count()
+          end
+
+        left =
+          if j == 0 do
+            0
+          else
+            grid
+            |> Enum.at(i)
+            |> Enum.slice(0..(j - 1))
+            |> Enum.reverse()
+            |> Utils.take_until(fn x -> x >= curr_tree_height end)
+            |> Enum.count()
+          end
+
+        top * right * bottom * left
+      end
+
+    scenic_score |> Enum.max()
+  end
+
+## should be 479400 for my input
+scores |> Enum.max()
+```
